@@ -5,12 +5,71 @@ from os import listdir
 from pathlib import Path
 import traceback
 import inspect
+import csv
 
 REQUIRED_COMMANDS = ['key', 'command_book']
 
 class CommandLoader:
     def __init__(self, p):
         self.player = p
+        self.module_name = None
+
+    def get_available_routines(self):
+        # return the complete file path of the selected routine
+        # will allow user to choose between routines within a folder
+        # that matches the loaded command book
+        path = join('resources', 'routines', self.module_name)
+        available_routines = [f for f in listdir(path) if isfile(join(path, f))]
+        available_routines_dir = {index + 1: available_routines[index] for index in range(len(available_routines))}
+        for index in available_routines_dir:
+            print(f"({index}):         {available_routines_dir[index]}")
+        
+        selected_routine = None
+        while True:
+            try:
+                selected_routine = available_routines_dir[int(input("Select command book: "))]
+                break
+            except:
+                print("invalid selection!")
+        
+        return(str(Path(join('resources', 'routines', self.module_name, selected_routine)).resolve()))
+
+
+    def build_routine(self):
+        path = self.get_available_routines()
+        routine = []
+        with open(path, "r") as r_file:
+            csvreader = csv.reader(r_file)
+            for row in csvreader:
+                # if any white spaces were loaded - remove them
+                while "" in row:
+                    row.remove("")
+                
+                new_command = ""
+                # begin analysing new command
+                # first index will always indicate the type of the command
+                if row[0] == "*":
+                    # this is a new point to move too
+                    # TODO - make sure index 1 and 2 contain numrical values
+                    new_command += f"p.go_to(({row[1]}, {row[2]}))"
+                
+                elif row[0] == "#":
+                    # this is a comment - ignore line
+                    continue
+
+                elif row[0] == "-":
+                    # this is an action to perform
+                    new_command += f"commands.{row[1]}("
+                    command_params = row[2:] # paramters to pass to the command function
+                    for param in command_params:
+                        new_command += f"{param}, "
+                
+                else:
+                    print(f"ERROR  while loading routine - unkown command type {row[0]}")
+                routine.append(new_command)
+            r_file.close()
+
+        return(routine)
     
     def get_available_command_books(self):
         path = join('resources', 'command_books')
@@ -28,6 +87,8 @@ class CommandLoader:
             except:
                 print("invalid selection!")
         
+        # set module name to the selected command_book name
+        self.module_name = selected_book[:selected_book.index(".py")]
         return(str(Path(join('resources', 'command_books', selected_book)).resolve()))
         
     
