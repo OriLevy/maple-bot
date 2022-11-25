@@ -68,7 +68,10 @@ if __name__ == "__main__":
     d = bind(c)
     g = Game((5, 60, 180, 130))
     p = Player(c, d, g)
-    commands = CommandLoader(p).load_command_book()
+    cl = CommandLoader(p)
+    commands = cl.load_command_book()
+    
+    routine = cl.build_routine()
 
     last_fed = time.time()
     while True:
@@ -86,7 +89,7 @@ if __name__ == "__main__":
             p.press(PetSettings.petfood_key)
 
         print(g.get_player_location())
-        for _ in range(12):
+        for _ in range(6):
             rune_location = g.get_rune_location()
             if rune_location is not None:
                 break
@@ -100,7 +103,7 @@ if __name__ == "__main__":
             commands.SolarSlashLunaDivide(direction='left', attacks=2, reps=2)
         
         p.go_to((37, 13))
-        commands.SolarSlashLunaDivide(direction='left', attacks=2, reps=7)
+        commands.SolarSlashLunaDivide(direction='left', attacks=2, reps=5)
         
         
         
