@@ -1,6 +1,6 @@
 class PetSettings:
     autofeed = True
-    petfood_key = "ins"
+    petfood_key = "del"
     num_of_pets = 1
 
 
@@ -8,6 +8,13 @@ class GeneralKeyBindigs:
     interact_key = "space"
     jump_key = "alt"
     rope_lift_key = None
+    
+class StartStopControl:
+    def __init__(self):
+        self.enabled = False
+        
+    def toggle_start_stop(self):
+        self.enabled = not self.enabled
 
 
 class ScanCodes:

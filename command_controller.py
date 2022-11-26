@@ -47,9 +47,15 @@ class CommandLoader:
 
 
     def build_routine(self):
-        path = self.get_available_routines_and_select()
+        file = self.get_available_routines_and_select()
+        # make sure provided file is a csv file
+        ext = splitext(file)[1]
+        if ext != ".csv":
+            # not a python file
+            print(f"ERROR '{ext}' is not a supported file extension for a routine.")
+            return False
         routine = []
-        with open(path, "r") as r_file:
+        with open(file, "r") as r_file:
             csvreader = csv.reader(r_file)
             for row in csvreader:
                 # if any white spaces were loaded - remove them
@@ -74,6 +80,7 @@ class CommandLoader:
                     command_params = row[2:] # paramters to pass to the command function
                     for param in command_params:
                         new_command += f"{param}, "
+                    new_command = new_command[:len(new_command) - 2] + ")"
                 
                 else:
                     print(f"ERROR  while loading routine - unkown command type {row[0]}")

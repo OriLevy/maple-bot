@@ -4,8 +4,10 @@ from rune_solver import find_arrow_directions
 from interception import *
 from game import Game
 from player import Player
-from config import PetSettings, GeneralKeyBindigs
+from config import PetSettings, GeneralKeyBindigs, StartStopControl
 from command_controller import CommandLoader
+import itertools
+from event_listener import KeyboardListener
 
 
 def bind(context):
@@ -70,40 +72,30 @@ if __name__ == "__main__":
     p = Player(c, d, g)
     cl = CommandLoader(p)
     commands = cl.load_command_book()
-    
     routine = cl.build_routine()
+    keyboard_listener = KeyboardListener(p)
+    keyboard_listener.start()
 
     last_fed = time.time()
-    while True:
-        # main bot body
-        other_player_location = g.get_other_location()
-        if other_player_location > 0:
-            print("A player has entered your map.")
+    for command in itertools.cycle(routine):
+        if keyboard_listener.enabled:
+            #print(g.get_player_location())
+            # main bot body
+            other_player_location = g.get_other_location()
+            if other_player_location > 0:
+                print("A player has entered your map.")
 
-        rune_location = g.get_rune_location()
-        if rune_location is not None:
-            print("A rune has appeared.")
-            solve_rune(g, p, rune_location)
-        
-        if PetSettings.autofeed and time.time() - last_fed > 600 / PetSettings.num_of_pets:
-            p.press(PetSettings.petfood_key)
-
-        print(g.get_player_location())
-        for _ in range(6):
             rune_location = g.get_rune_location()
             if rune_location is not None:
-                break
-            p.go_to((108, 22))  
-            commands.SolarSlashLunaDivide(direction='right', attacks=2, reps=2)
-            commands.SolarSlashLunaDivide(direction='left', attacks=2, reps=2)
-            time.sleep(0.2)
-            commands.EquinoxSlash(direction='left')
-            p.go_to((70, 22))
-            commands.SolarSlashLunaDivide(direction='right', attacks=2, reps=2)
-            commands.SolarSlashLunaDivide(direction='left', attacks=2, reps=2)
+                print("A rune has appeared.")
+                solve_rune(g, p, rune_location)
+            
+            if PetSettings.autofeed and time.time() - last_fed > 600 / PetSettings.num_of_pets:
+                p.press(PetSettings.petfood_key)
+
+            #print(g.get_player_location())
+            eval(command)
         
-        p.go_to((37, 13))
-        commands.SolarSlashLunaDivide(direction='left', attacks=2, reps=5)
         
         
         
