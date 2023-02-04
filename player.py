@@ -26,7 +26,6 @@ class Player:
             self.context.send(self.device, key_stroke(SC_DECIMAL[key], 1, 0))
 
     def press(self, key, repeat=1):
-        print(f"pressing key {key}")
         """
         Mimics a human key-press.
         Delay between down-stroke and up-stroke was tested to be around 50 ms.
@@ -43,7 +42,6 @@ class Player:
                 self.context.send(self.device, key_stroke(SC_DECIMAL[key], 1, 0))
 
     def release(self, key):
-        print(f"releasing key {key}")
         key = key.lower()
         if key in SC_DECIMAL_ARROW:
             self.context.send(self.device, key_stroke(SC_DECIMAL_ARROW[key], 3, 0))
@@ -51,7 +49,6 @@ class Player:
             self.context.send(self.device, key_stroke(SC_DECIMAL[key], 1, 0))
 
     def hold(self, key):
-        print(f"holding key {key}")  
         key = key.lower()
         if key in SC_DECIMAL_ARROW:
             self.context.send(self.device, key_stroke(SC_DECIMAL_ARROW[key], 2, 0))
